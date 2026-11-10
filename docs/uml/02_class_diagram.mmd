@@ -1,10 +1,9 @@
 classDiagram
     direction TB
 
-    class UserRole {
+    class SystemRole {
         <<enumeration>>
-        BUYER
-        SELLER
+        MEMBER
         ADMIN
     }
 
@@ -66,7 +65,7 @@ classDiagram
         +String email
         +String passwordHash
         +String nickname
-        +UserRole role
+        +SystemRole role
         +Boolean isEmailVerified
         +Float averageRating
         +Boolean isActive
@@ -115,6 +114,8 @@ classDiagram
         +UUID sellerId
         +Integer closingPrice
         +String snapshotBookTitle
+        +String snapshotBookAuthor
+        +String snapshotBookEdition
         +String snapshotCondition
         +OrderStatus status
         +DeliveryType deliveryType
@@ -189,19 +190,19 @@ classDiagram
         +recordAudit()
     }
 
-    User "1" -- "0..*" Listing : creates
-    User "1" -- "0..*" Order : places
-    User "1" -- "0..*" Order : receives
+    User "1" -- "0..*" Listing : creates as seller
+    User "1" -- "0..*" Order : places as buyer
+    User "1" -- "0..*" Order : receives as seller
     User "1" -- "0..*" Review : authors
     User "1" -- "0..*" Review : receives
     User "1" -- "0..*" AuditLog : operates
 
     Book "1" -- "0..*" Listing : classified as
 
-    Listing "1" -- "0..1" Order : transacts
+    Listing "1" -- "0..*" Order : recorded in
 
     Order "1" -- "1" Shipment : contains
     Order "1" -- "0..1" Dispute : escalates to
     Order "1" -- "0..2" Review : allows
 
-    Dispute "0..1" -- "1" User : ruled by Admin
+    Dispute "0..*" -- "0..1" User : adjudicated by Admin
