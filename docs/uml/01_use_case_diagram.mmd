@@ -1,0 +1,99 @@
+flowchart LR
+    %% Actors 定義
+    subgraph Actors ["系統使用者與外部介面"]
+        Guest["訪客 / 未驗證會員"]
+        Buyer["買家（Buyer）"]
+        Seller["賣家（Seller）"]
+        Admin["平台管理員（Admin）"]
+        BookAPI["外部書籍 API（Google Books / Open Library）"]
+    end
+
+    %% System Boundary 定義
+    subgraph SystemBoundary ["二手書交易平台系統邊界（MVP 範圍）"]
+        subgraph AccountModule ["帳號與驗證模組"]
+            UC01(["FR-001 註冊帳號"])
+            UC02(["FR-002 登入帳號"])
+            UC03(["FR-003, BR-014 驗證與重驗 Email"])
+            UC04(["FR-004 編輯個人檔案與 Email"])
+            UC05(["FR-024 申請刪除帳號"])
+        end
+
+        subgraph BrowseModule ["瀏覽與搜尋模組"]
+            UC06(["FR-009, FR-010 搜尋與分類價格篩選"])
+            UC07(["FR-011 檢視書籍與在售刊登列表"])
+        end
+
+        subgraph ListingModule ["書籍與刊登管理模組"]
+            UC08(["FR-006 ISBN 自動帶入書目"])
+            UC09(["FR-007 手動填寫書籍資料"])
+            UC10(["FR-005, FR-008 建立刊登與照片檢核"])
+            UC11(["FR-005, BR-013 編輯、下架與重新上架"])
+        end
+
+        subgraph OrderModule ["交易與物流履約模組"]
+            UC12(["FR-012, BR-002 下單購買並鎖定刊登"])
+            UC13(["FR-016, BR-013 待出貨主動取消訂單"])
+            UC14(["FR-013 填寫物流並標記出貨"])
+            UC15(["FR-014, BR-004 標記已取貨"])
+            UC16(["FR-015, BR-005 確認收貨（人工或逾期自動）"])
+        end
+
+        subgraph AfterSalesModule ["爭議與評價模組"]
+            UC17(["FR-017, BR-006 提出書況不符爭議"])
+            UC18(["FR-018, BR-007 回應爭議與提交證據"])
+            UC19(["FR-019, BR-009 訂單完成後雙向互評"])
+        end
+
+        subgraph AdminModule ["後台管理模組"]
+            UC20(["FR-020 使用者管理（停用與恢復）"])
+            UC21(["FR-021 違規刊登強制下架"])
+            UC22(["FR-022, NFR-009 檢視訂單與收件個資"])
+            UC23(["FR-018, FR-023 爭議裁決（買家或賣家有理）"])
+            UC24(["FR-028, BR-012 調整交易與評價期限"])
+            UC25(["NFR-006 檢視後台操作稽核日誌"])
+        end
+    end
+
+    %% Actor 關聯連線
+    Guest --> UC01
+    Guest --> UC02
+    Guest --> UC03
+    Guest --> UC06
+    Guest --> UC07
+
+    Buyer --> UC02
+    Buyer --> UC03
+    Buyer --> UC04
+    Buyer --> UC05
+    Buyer --> UC06
+    Buyer --> UC07
+    Buyer --> UC12
+    Buyer --> UC13
+    Buyer --> UC15
+    Buyer --> UC16
+    Buyer --> UC17
+    Buyer --> UC19
+
+    Seller --> UC02
+    Seller --> UC03
+    Seller --> UC04
+    Seller --> UC05
+    Seller --> UC08
+    Seller --> UC09
+    Seller --> UC10
+    Seller --> UC11
+    Seller --> UC13
+    Seller --> UC14
+    Seller --> UC18
+    Seller --> UC19
+
+    Admin --> UC20
+    Admin --> UC21
+    Admin --> UC22
+    Admin --> UC23
+    Admin --> UC24
+    Admin --> UC25
+
+    UC08 -.->|外部資料查詢| BookAPI
+    UC12 -.->|include| UC07
+    UC17 -.->|extend| UC16
