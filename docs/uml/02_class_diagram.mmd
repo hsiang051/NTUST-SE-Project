@@ -1,0 +1,212 @@
+classDiagram
+    direction TB
+
+    class SystemRole {
+        <<enumeration>>
+        MEMBER
+        ADMIN
+    }
+
+    class ListingStatus {
+        <<enumeration>>
+        ACTIVE
+        LOCKED
+        SOLD
+        INACTIVE
+    }
+
+    class OrderStatus {
+        <<enumeration>>
+        PENDING_SHIPMENT
+        SHIPPING
+        PENDING_CONFIRMATION
+        COMPLETED
+        CANCELLED
+        DISPUTED
+    }
+
+    class DeliveryType {
+        <<enumeration>>
+        HOME_DELIVERY
+        CONVENIENCE_STORE
+    }
+
+    class ShipmentStatus {
+        <<enumeration>>
+        SHIPPED
+        DELIVERED
+    }
+
+    class BookCategory {
+        <<enumeration>>
+        LITERATURE
+        BUSINESS
+        SCIENCE
+        HUMANITIES
+        ART_DESIGN
+        COMPUTER_IT
+        LANGUAGE
+        EXAM
+        COMIC_LIGHT_NOVEL
+        LIFESTYLE
+        CHILDREN
+        OTHER
+    }
+
+    class DisputeRuling {
+        <<enumeration>>
+        PENDING
+        BUYER_FAVORED
+        SELLER_FAVORED
+    }
+
+    class User {
+        +UUID id
+        +String email
+        +String passwordHash
+        +String nickname
+        +SystemRole role
+        +Boolean isEmailVerified
+        +Float averageRating
+        +Boolean isActive
+        +DateTime registeredAt
+        +register(email, password, nickname)
+        +login(email, password)
+        +verifyEmail(token)
+        +updateProfile(nickname, password)
+        +requestDeletion()
+    }
+
+    class Book {
+        +UUID id
+        +String isbn
+        +String title
+        +String author
+        +String publisher
+        +String edition
+        +BookCategory category
+        +String coverUrl
+        +fetchExternalByIsbn(isbn)
+    }
+
+    class Listing {
+        +UUID id
+        +UUID bookId
+        +UUID sellerId
+        +Integer price
+        +String conditionDescription
+        +String[] photoUrls
+        +ListingStatus status
+        +DateTime createdAt
+        +DateTime updatedAt
+        +createListing(photos, price, condition)
+        +editListing(price, condition)
+        +delist()
+        +relist()
+        +lock()
+        +markSold()
+    }
+
+    class Order {
+        +UUID id
+        +UUID listingId
+        +UUID buyerId
+        +UUID sellerId
+        +Integer closingPrice
+        +String snapshotBookTitle
+        +String snapshotBookAuthor
+        +String snapshotBookIsbn
+        +String snapshotBookPublisher
+        +String snapshotBookEdition
+        +BookCategory snapshotBookCategory
+        +String snapshotBookCoverUrl
+        +String snapshotCondition
+        +OrderStatus status
+        +DeliveryType deliveryType
+        +String recipientName
+        +String recipientPhone
+        +String recipientAddress
+        +String storeName
+        +DateTime createdAt
+        +DateTime shipDeadline
+        +DateTime confirmDeadline
+        +DateTime reviewDeadline
+        +createOrder()
+        +cancelOrder(reason)
+        +markShipped(method, trackingNo)
+        +markPickedUp()
+        +confirmReceipt()
+        +raiseDispute(reason, evidence)
+        +autoCompleteOnExpiry()
+        +autoCancelOnExpiry()
+    }
+
+    class Shipment {
+        +UUID id
+        +UUID orderId
+        +String shippingMethod
+        +String trackingNumber
+        +ShipmentStatus status
+        +DateTime shippedAt
+        +DateTime pickedUpAt
+        +recordShipping(method, trackingNo)
+        +recordPickup()
+    }
+
+    class Dispute {
+        +UUID id
+        +UUID orderId
+        +UUID initiatorId
+        +String reason
+        +String buyerDescription
+        +String[] buyerEvidencePhotos
+        +String sellerResponse
+        +String[] sellerEvidencePhotos
+        +DisputeRuling ruling
+        +UUID ruledByAdminId
+        +DateTime ruledAt
+        +submitDispute(photos, description)
+        +submitSellerResponse(photos, description)
+        +adjudicate(ruling, adminId)
+    }
+
+    class Review {
+        +UUID id
+        +UUID orderId
+        +UUID reviewerId
+        +UUID revieweeId
+        +Integer rating
+        +String comment
+        +DateTime createdAt
+        +submitReview(rating, comment)
+    }
+
+    class AuditLog {
+        +UUID id
+        +UUID operatorId
+        +String actionType
+        +String targetEntity
+        +UUID targetId
+        +String previousState
+        +String newState
+        +String note
+        +DateTime createdAt
+        +recordAudit()
+    }
+
+    User "1" -- "0..*" Listing : creates as seller
+    User "1" -- "0..*" Order : places as buyer
+    User "1" -- "0..*" Order : receives as seller
+    User "1" -- "0..*" Review : authors
+    User "1" -- "0..*" Review : receives
+    User "1" -- "0..*" AuditLog : operates
+
+    Book "1" -- "0..*" Listing : classified as
+
+    Listing "1" -- "0..*" Order : recorded in
+
+    Order "1" -- "1" Shipment : contains
+    Order "1" -- "0..1" Dispute : escalates to
+    Order "1" -- "0..2" Review : allows
+
+    Dispute "0..*" -- "0..1" User : adjudicated by Admin
