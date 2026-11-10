@@ -26,6 +26,18 @@ classDiagram
         DISPUTED
     }
 
+    class DeliveryType {
+        <<enumeration>>
+        HOME_DELIVERY
+        CONVENIENCE_STORE
+    }
+
+    class ShipmentStatus {
+        <<enumeration>>
+        SHIPPED
+        DELIVERED
+    }
+
     class BookCategory {
         <<enumeration>>
         LITERATURE
@@ -62,7 +74,6 @@ classDiagram
         +register(email, password, nickname)
         +login(email, password)
         +verifyEmail(token)
-        +updateEmail(newEmail)
         +updateProfile(nickname, password)
         +requestDeletion()
     }
@@ -106,9 +117,11 @@ classDiagram
         +String snapshotBookTitle
         +String snapshotCondition
         +OrderStatus status
+        +DeliveryType deliveryType
         +String recipientName
         +String recipientPhone
         +String recipientAddress
+        +String storeName
         +DateTime createdAt
         +DateTime shipDeadline
         +DateTime confirmDeadline
@@ -128,9 +141,9 @@ classDiagram
         +UUID orderId
         +String shippingMethod
         +String trackingNumber
+        +ShipmentStatus status
         +DateTime shippedAt
         +DateTime pickedUpAt
-        +String status
         +recordShipping(method, trackingNo)
         +recordPickup()
     }

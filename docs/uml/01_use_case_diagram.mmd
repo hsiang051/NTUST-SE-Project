@@ -13,8 +13,8 @@ flowchart LR
         subgraph AccountModule ["帳號與驗證模組"]
             UC01(["FR-001 註冊帳號"])
             UC02(["FR-002 登入帳號"])
-            UC03(["FR-003, BR-014 驗證與重驗 Email"])
-            UC04(["FR-004 編輯個人檔案與 Email"])
+            UC03(["FR-003 註冊 Email 驗證"])
+            UC04(["FR-004 編輯個人檔案（暱稱與密碼）"])
             UC05(["FR-024 申請刪除帳號"])
         end
 
@@ -27,7 +27,7 @@ flowchart LR
             UC08(["FR-006 ISBN 自動帶入書目"])
             UC09(["FR-007 手動填寫書籍資料"])
             UC10(["FR-005, FR-008 建立刊登與照片檢核"])
-            UC11(["FR-005, BR-013 編輯、下架與重新上架"])
+            UC11(["FR-005, BR-013 編輯、下架與手動重新上架"])
         end
 
         subgraph OrderModule ["交易與物流履約模組"]
